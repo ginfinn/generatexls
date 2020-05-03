@@ -17,20 +17,7 @@ public class MainController {
     RestTeammateService restTeammateService;
     @GetMapping("getJson")
     public List<Event> getJosn() throws JsonProcessingException {
-// Instantiating a Workbook object
-        Workbook workbook = new Workbook();
-        Worksheet worksheet = workbook.getWorksheets().get(0);
-// Set Styles
-        CellsFactory factory = new CellsFactory();
-        Style style = factory.createStyle();
-        style.setHorizontalAlignment(TextAlignmentType.CENTER);
-        style.getFont().setColor(Color.getBlueViolet());
-        style.getFont().setBold(true);
 
-        // Set JsonLayoutOptions
-        JsonLayoutOptions options = new JsonLayoutOptions();
-        options.setTitleStyle(style);
-        options.setArrayAsTable(true);
         return restTeammateService.getJson();
     }
 

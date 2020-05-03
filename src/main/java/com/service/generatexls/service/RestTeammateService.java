@@ -2,7 +2,10 @@ package com.service.generatexls.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.service.generatexls.dto.Event;
+import com.service.generatexls.dto.Participant;
+import com.service.generatexls.dto.Shift;
 import com.service.generatexls.dto.User;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -13,10 +16,13 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Function;
 
 @Service
 public class RestTeammateService {
     //  static String q = "?end=2020-05-04T00:00:00Z&begin=2020-01-01T00:00:00Z";
+
+
     @Autowired
     private RestTemplate restTemplate;
 
@@ -34,9 +40,27 @@ public class RestTeammateService {
                 entity,
                 new ParameterizedTypeReference<List<Event>>() {
                 });
+        HashMap<User, HashMap<Date, List<Shift>>> data = new HashMap<>();
 
-        HashMap<User, HashMap<Date, List<String>>> data = new HashMap<>();
-        
+
+        for (val event : response.getBody()
+        ) {
+            for (val shift : event.getShifts()
+            ) {
+                for (val place : shift.getPlaces()
+                ) {
+                    for (val participants : place.getParticipants()
+                    ) {
+
+                        val dateAndShift = data.putIfAbsent(participants.getUser(), new HashMap<Date, List<Shift>>());
+                        dateAndShift.put(shift.getBeginTime(), event.getShifts());
+                    }
+
+                }
+
+            }
+
+        }
 
 
         return response.getBody();

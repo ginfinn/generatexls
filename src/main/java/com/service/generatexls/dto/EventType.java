@@ -9,7 +9,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-    public class Participant {
-    private User user;
-    private EventRole eventRole;
+public class EventType {
+    private String title;
 }
