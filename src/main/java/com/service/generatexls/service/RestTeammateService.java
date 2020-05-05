@@ -2,21 +2,19 @@ package com.service.generatexls.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.service.generatexls.dto.Event;
-import com.service.generatexls.dto.Participant;
-import com.service.generatexls.dto.Shift;
 import com.service.generatexls.dto.User;
 import lombok.val;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.function.Function;
+import java.util.*;
 
 @Service
 public class RestTeammateService {
@@ -40,8 +38,16 @@ public class RestTeammateService {
                 entity,
                 new ParameterizedTypeReference<List<Event>>() {
                 });
-        HashMap<User, HashMap<Date, List<Shift>>> data = new HashMap<>();
+        HashMap<User, HashMap<Date, String>> data = new HashMap<>();
+        Set<Date> treeSet = new TreeSet<Date>();
+        for (val event : response.getBody()
+        ) {
+            for (val shift : event.getShifts()
+            ) {
+                treeSet.add(shift.getBeginTime());
+            }
 
+        }
 
         for (val event : response.getBody()
         ) {
@@ -51,9 +57,11 @@ public class RestTeammateService {
                 ) {
                     for (val participants : place.getParticipants()
                     ) {
+                        data.putIfAbsent(participants.getUser(), new HashMap<Date, String>());
+                        val dateAndShift = data.get(participants.getUser());
+                        dateAndShift.put(shift.getBeginTime(), participants.getEventRole().getTitle());
 
-                        val dateAndShift = data.putIfAbsent(participants.getUser(), new HashMap<Date, List<Shift>>());
-                        dateAndShift.put(shift.getBeginTime(), event.getShifts());
+
                     }
 
                 }
@@ -61,8 +69,25 @@ public class RestTeammateService {
             }
 
         }
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet1 = workbook.createSheet("Сводка");
+        XSSFFont font = workbook.createFont();
+        XSSFCellStyle style = workbook.createCellStyle();
+        /*HashMap<EventType, List<Date>> data2 = new HashMap<>();
+        for (val event : response.getBody()
+        ) {
+            for (val shift : event.getShifts()
+            ) {
+
+                data2.putIfAbsent(event.getEventType(), new List<Date>() );
+                val a = data2.get(event.getEventType());
 
 
+
+
+            }
+        }
+*/
         return response.getBody();
     }
 }
