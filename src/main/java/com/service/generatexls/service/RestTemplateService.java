@@ -80,14 +80,10 @@ public class RestTemplateService {
             dateSet.stream().forEach(date -> {
                 val cell = row.createCell(col.getAndIncrement());
                 val cellValue = data.get(user).get(date);
-                if (cellValue != null) {
-                    cell.setCellValue(cellValue);
-                }
-                else{
-                    cell.setCellValue("-");
-                }
+                cell.setCellValue(cellValue != null ? cellValue : "-");
             });
         });
+
 
         try (FileOutputStream outputStream = new FileOutputStream("сводка.xlsx")) {
             workbook.write(outputStream);
