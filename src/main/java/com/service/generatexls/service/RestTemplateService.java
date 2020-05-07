@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,7 +42,7 @@ public class RestTemplateService {
 
         HashMap<String, HashMap<Date, String>> data = new HashMap<>();
         Set<String> userSet = new HashSet<>();
-        Set<Date> dateSet = new TreeSet<>();
+        ArrayList<Date> dateSet = new ArrayList<>()  ;
 
         for (val event : response.getBody()) {
             for (val shift : event.getShifts()) {
@@ -69,7 +70,6 @@ public class RestTemplateService {
         dateSet.stream().forEach(date -> {
             firstRow.createCell(colNum.getAndIncrement()).setCellValue(dateFormat.format(date));
         });
-
 
         userSet.stream().forEach(user -> {
             val userSplitted = user.split(" ");
